@@ -1,8 +1,15 @@
 import cv2
 import numpy as np
 from keras.models import load_model
+from huggingface_hub import hf_hub_download
 
-model = load_model('model_file_30epochs.h5')
+
+model_path = hf_hub_download(
+    repo_id="samikshachougule-hub/emotion-recognition-model",
+    filename="model_file_30epochs.h5"
+)
+model = load_model(model_path)
+
 faceDetect = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
 
 labels_dict = {0:'Angry',1:'Disgust', 2:'Fear', 3:'Happy',4:'Neutral',5:'Sad',6:'Surprise'}
@@ -24,5 +31,6 @@ def predict_frame(frame):
         cv2.rectangle(frame, (x, y), (x+w, y+h), (0,255,0), 2)
         cv2.putText(frame, label, (x, y-10),
                      cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0,255,0), 2)
+
 
     return frame
