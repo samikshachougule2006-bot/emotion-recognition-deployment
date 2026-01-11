@@ -1,26 +1,24 @@
-import onnxruntime as ort
-import numpy as np
 import cv2
+import numpy as np
 from huggingface_hub import hf_hub_download
+from onnxruntime_web import InferenceSession
 
-# download ONNX model from HF Hub
 model_path = hf_hub_download(
     repo_id="samikshachougule-hub/emotion-recognition-model",
     filename="model.onnx"
 )
 
-# load ONNX session
-session = ort.InferenceSession(model_path, providers=["CPUExecutionProvider"])
+session = InferenceSession(model_path)
 
-input_name = session.get_inputs()[0].name
-output_name = session.get_outputs()[0].name
+input_name = session.input_names[0]
+output_name = session.output_names[0]
 
 faceDetect = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
 
 labels_dict = {0:'Angry',1:'Disgust',2:'Fear',3:'Happy',4:'Neutral',5:'Sad',6:'Surprise'}
 
-def predict_image(image):
-    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+def predict_image(frame):
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     faces = faceDetect.detectMultiScale(gray, 1.3, 5)
 
     if len(faces):
@@ -30,7 +28,7 @@ def predict_image(image):
         crop = crop / 255.0
         crop = np.reshape(crop,(1,48,48,1)).astype(np.float32)
 
-        preds = session.run([output_name], {input_name: crop})[0]
+        preds = session.run({input_name: crop})[output_name]
         label = labels_dict[np.argmax(preds)]
         return label
 
