@@ -1,9 +1,8 @@
-fastapi
-uvicorn
+streamlit==1.35.0
 opencv-python
-numpy
-streamlit
-keras
-tensorflow
-python-multipart
-requests
+tensorflow==2.15.0
+keras==2.15.0
+numpy==1.24.3
+pandas==1.5.3
+protobuf==4.24.4
+huggingface-hub
